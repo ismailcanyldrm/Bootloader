@@ -1,0 +1,25 @@
+typedef void (*pFunction)(void);
+pFunction JumpToApplication;
+uint32_t JumpAddress;
+
+int main(void)
+{
+  /* Configure systick timer */
+  /* ... */
+  
+  /* Check if the user button is pressed */
+  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET)
+  {
+    /* User button is pressed, execute user application */
+    JumpAddress = *(volatile uint32_t *)(0x0800C000 + 4);
+    JumpToApplication = (pFunction)JumpAddress;
+    __set_MSP(*(volatile uint32_t *)0x0800C000);
+    JumpToApplication();
+  }
+  
+  /* User button is not pressed, stay in bootloader */
+  while (1)
+  {
+    /* ... */
+  }
+}
